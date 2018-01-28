@@ -531,7 +531,7 @@ MonoBehaviour:
   gridY: 7
   padding: 0.2
   timeElapsed: 0
-  turnTime: 2
+  turnTime: 4
 --- !u!81 &790450727
 AudioListener:
   m_ObjectHideFlags: 0
