@@ -100,13 +100,6 @@ public class GameController : MonoBehaviour {
 		player1 = Instantiate (PlayerPrefab);
 		player1.gameController = this;
 		player1.id = 1;
-		List<KeyCode> player1KeyCodes = new List<KeyCode> ();
-		player1KeyCodes.Add (KeyCode.UpArrow);
-		player1KeyCodes.Add (KeyCode.RightArrow);
-		player1KeyCodes.Add (KeyCode.DownArrow);
-		player1KeyCodes.Add (KeyCode.LeftArrow);
-		player1KeyCodes.Add (KeyCode.Return);
-		player1.playerKeyCodes = player1KeyCodes;
 		player1.darkColor = new Color (1.0f, 0.0f, 0.0f); // red
 		player1.lightColor = new Color (1.0f, 0.4f, 0.4f); // red
 		nodes [0, 0].AssignPlayerHover (player1);
@@ -120,13 +113,6 @@ public class GameController : MonoBehaviour {
 		player2 = Instantiate (PlayerPrefab);
 		player2.gameController = this;
 		player2.id = 2;
-		List<KeyCode> player2KeyCodes = new List<KeyCode> ();
-		player2KeyCodes.Add (KeyCode.W);
-		player2KeyCodes.Add (KeyCode.D);
-		player2KeyCodes.Add (KeyCode.S);
-		player2KeyCodes.Add (KeyCode.A);
-		player2KeyCodes.Add (KeyCode.Space);
-		player2.playerKeyCodes = player2KeyCodes;
 		player2.darkColor = new Color (0.0f, 0.0f, 1.0f); // blue
 		player2.lightColor = new Color (0.4f, 0.4f, 1.0f); // blue
 		nodes [gridX - 1, gridY - 1].AssignPlayerHover (player2);

@@ -7,20 +7,42 @@ public class Player : MonoBehaviour {
 	public Color darkColor;
 	public GameController gameController;
 	public int id;
+	public float inputTimeout = 0.1f;
+	public float inputTimer = 0.1f;
 	public Color lightColor;
-	public List<KeyCode> playerKeyCodes = new List<KeyCode> (); // indx 0 == up, indx 1 == right, indx 2 == down, indx 3 == left, 4 == select
 	public int selectionsMade = 0;
 	public Node[] Tokens;
 
 	void Update () {
-		for (int i = 0; i < 4; i++) {
-			if (Input.GetKeyDown (playerKeyCodes [i])) {
-				gameController.MovePlayer (this, i);
-			}
+		if (Input.GetAxis ("Joy" + id + "Select") > 0.8f) {
+			gameController.SelectNode (this);
+		}
+		
+		if (inputTimer < inputTimeout) {
+			inputTimer += Time.deltaTime;
+			return;
+		}
+		
+		if (Input.GetAxis ("Joy" + id + "Y") > 0.8f) {
+			Debug.Log (Input.GetAxis ("Joy" + id + "Y"));
+			gameController.MovePlayer (this, 2);
+			inputTimer = 0.0f;
 		}
 
-		if (Input.GetKeyDown (playerKeyCodes[4]))
-			gameController.SelectNode (this);
+		if (Input.GetAxis ("Joy" + id + "X") > 0.8f) {
+			gameController.MovePlayer (this, 1);
+			inputTimer = 0.0f;
+		}
+
+		if (Input.GetAxis ("Joy" + id + "Y") < -0.8f) {
+			gameController.MovePlayer (this, 0);
+			inputTimer = 0.0f;
+		}
+
+		if (Input.GetAxis ("Joy" + id + "X") < -0.8f) {
+			gameController.MovePlayer (this, 3);
+			inputTimer = 0.0f;
+		}
 	}
 
 	public void MakeSelection () {
