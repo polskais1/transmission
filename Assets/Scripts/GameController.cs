@@ -3,9 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-// TODO Add in animations for nodes spreading
 // TODO Add in controller support
-// TODO Add in icons with the amount of tokens a player has left per turn
 // TODO Add in more players
 
 public class GameController : MonoBehaviour {
@@ -113,11 +111,11 @@ public class GameController : MonoBehaviour {
 		player1.lightColor = new Color (1.0f, 0.4f, 0.4f); // red
 		nodes [0, 0].AssignPlayerHover (player1);
 		player1.currentPosition = new int[2] { 0, 0 };
-		player1TokensRemaining = new Node[] { Instantiate (NodePrefab), Instantiate (NodePrefab) };
-		player1TokensRemaining [0].SetPosition (new Vector2 (-8f, -4f));
-		player1TokensRemaining [0].AssignPlayerToEntireNode (player1);
-		player1TokensRemaining [1].SetPosition (new Vector2 (-6.5f, -4f));
-		player1TokensRemaining [1].AssignPlayerToEntireNode (player1);
+		player1.Tokens = new Node[] { Instantiate (NodePrefab), Instantiate (NodePrefab) };
+		player1.Tokens [0].SetPosition (new Vector2 (-8f, -4f));
+		player1.Tokens [0].AssignPlayerToEntireNode (player1);
+		player1.Tokens [1].SetPosition (new Vector2 (-6.5f, -4f));
+		player1.Tokens [1].AssignPlayerToEntireNode (player1);
 
 		player2 = Instantiate (PlayerPrefab);
 		player2.gameController = this;
@@ -133,11 +131,11 @@ public class GameController : MonoBehaviour {
 		player2.lightColor = new Color (0.4f, 0.4f, 1.0f); // blue
 		nodes [gridX - 1, gridY - 1].AssignPlayerHover (player2);
 		player2.currentPosition = new int[2] { gridX - 1, gridY - 1 };
-		player2TokensRemaining = new Node[] { Instantiate (NodePrefab), Instantiate (NodePrefab) };
-		player2TokensRemaining [0].SetPosition (new Vector2 (8f, -4f));
-		player2TokensRemaining [0].AssignPlayerToEntireNode (player2);
-		player2TokensRemaining [1].SetPosition (new Vector2 (6.5f, -4f));
-		player2TokensRemaining [1].AssignPlayerToEntireNode (player2);
+		player2.Tokens = new Node[] { Instantiate (NodePrefab), Instantiate (NodePrefab) };
+		player2.Tokens [0].SetPosition (new Vector2 (8f, -4f));
+		player2.Tokens [0].AssignPlayerToEntireNode (player2);
+		player2.Tokens [1].SetPosition (new Vector2 (6.5f, -4f));
+		player2.Tokens [1].AssignPlayerToEntireNode (player2);
 
 		timeElapsed = 0;
 		winScreenCountdown = 0.0f;
@@ -183,7 +181,7 @@ public class GameController : MonoBehaviour {
 			if (targetNode.state != 2) {
 				targetNode.AssignPlayer (player, 2);
 				targetNode.futureState = 2;
-				player.selectionsMade++;
+				player.MakeSelection ();
 			}
 		}
 	}
@@ -196,6 +194,7 @@ public class GameController : MonoBehaviour {
 				if (node.state != 2) {
 					Player advantage = CheckAdvantage (x, y);
 					if (advantage != null) {
+						node.shouldAnimate = true;
 						if (node.owner != null && advantage.id == node.owner.id) {
 							node.futureState = 2;
 						} else {
@@ -273,8 +272,8 @@ public class GameController : MonoBehaviour {
 	void BeginNextTurn () {
 		inBreak = false;
 		timeElapsed = 0;
-		player1.selectionsMade = 0;
-		player2.selectionsMade = 0;
+		player1.EnableAllTokens ();
+		player2.EnableAllTokens ();
 	}
 
 	void BeginBreak () {
@@ -285,7 +284,6 @@ public class GameController : MonoBehaviour {
 			for (int y = 0; y < gridY; y++) {
 				Node node = nodes [x, y];
 				if (node.futureOwner != null) {
-					node.owner = node.futureOwner;
 					node.AssignPlayerWithAnimation (node.futureOwner, node.futureState);
 				}
 				if (node.futureState != null)
@@ -304,6 +302,9 @@ public class GameController : MonoBehaviour {
 			WinnerText.color = winner.lightColor;
 		} else
 			WinnerText.text = "Draw";
+
+		player1.DestroyTokens ();
+		player2.DestroyTokens ();
 		gameOver = true;
 	}
 

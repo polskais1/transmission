@@ -7,8 +7,8 @@ public class Node : MonoBehaviour {
 	private Material centerMaterial;
 	private Color colorA;
 	private Color colorB;
-	private float colorAnimationCountdown = 0.5F;
-	private float colorAnimationTime = 0.5f;
+	private float colorAnimationCountdown = 1.0f;
+	private float colorAnimationTime = 1.0f;
 	private int colorIndex = 0;
 	private bool hasMounted = false;
 	private List<Color> hoveringPlayersColors = new List<Color> ();
@@ -19,6 +19,7 @@ public class Node : MonoBehaviour {
 	public int futureState;
 	public Player owner;
 	public Vector2 position;
+	public bool shouldAnimate = false;
 	public int state = 0; // 0 is empty, 1 is light, 2 is dark
 
 	void Start () {
@@ -30,9 +31,11 @@ public class Node : MonoBehaviour {
 	}
 
 	void Update () {
-		if (colorAnimationCountdown < colorAnimationTime) {
+		if (colorAnimationCountdown < colorAnimationTime && shouldAnimate) {
 			centerMaterial.color = Color.Lerp (colorA, colorB, colorAnimationCountdown);
 			colorAnimationCountdown += Time.deltaTime;
+		} else if (shouldAnimate) {
+			shouldAnimate = false;
 		}
 	}
 
@@ -79,14 +82,14 @@ public class Node : MonoBehaviour {
 	}
 
 	public void AssignPlayerWithAnimation (Player player, int newState) {
-		owner = player;
 		if (newState == 1) {
-			colorA = new Color (1, 1, 1);
+			colorA = owner != null ? owner.lightColor : new Color (1, 1, 1);
 			colorB = player.lightColor;
 		} else {
 			colorA = player.lightColor;
 			colorB = player.darkColor;
 		}
+		owner = player;
 		colorAnimationCountdown = 0.0f;
 		state = newState;
 	}
