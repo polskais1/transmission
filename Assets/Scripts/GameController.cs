@@ -131,9 +131,9 @@ public class GameController : MonoBehaviour {
 		nodes [0, 0].AssignPlayerHover (player1);
 		player1.currentPosition = new int[2] { 0, 0 };
 		player1.Tokens = new Node[] { Instantiate (NodePrefab), Instantiate (NodePrefab) };
-		player1.Tokens [0].SetPosition (new Vector2 (-8f, -4f));
+		player1.Tokens [0].SetPosition (new Vector2 (-7f, -4f));
 		player1.Tokens [0].AssignPlayerToEntireNode (player1);
-		player1.Tokens [1].SetPosition (new Vector2 (-6.5f, -4f));
+		player1.Tokens [1].SetPosition (new Vector2 (-5.5f, -4f));
 		player1.Tokens [1].AssignPlayerToEntireNode (player1);
 
 		player2 = Instantiate (PlayerPrefab);
@@ -151,9 +151,9 @@ public class GameController : MonoBehaviour {
 		nodes [gridX - 1, gridY - 1].AssignPlayerHover (player2);
 		player2.currentPosition = new int[2] { gridX - 1, gridY - 1 };
 		player2.Tokens = new Node[] { Instantiate (NodePrefab), Instantiate (NodePrefab) };
-		player2.Tokens [0].SetPosition (new Vector2 (8f, -4f));
+		player2.Tokens [0].SetPosition (new Vector2 (7f, -4f));
 		player2.Tokens [0].AssignPlayerToEntireNode (player2);
-		player2.Tokens [1].SetPosition (new Vector2 (6.5f, -4f));
+		player2.Tokens [1].SetPosition (new Vector2 (5.5f, -4f));
 		player2.Tokens [1].AssignPlayerToEntireNode (player2);
 
 		timeElapsed = 0;
