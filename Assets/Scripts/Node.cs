@@ -8,12 +8,14 @@ public class Node : MonoBehaviour {
 	private int colorIndex = 0;
 	private bool hasMounted = false;
 	private List<Color> hoveringPlayersColors = new List<Color> ();
-	private Player owner;
 
 	public GameObject border;
 	public GameObject center;
-	public float state; // 0 is empty, 0.5 is light, 1 is dark
+	public Player futureOwner;
+	public int futureState;
+	public Player owner;
 	public Vector2 position;
+	public int state = 0; // 0 is empty, 1 is light, 2 is dark
 
 	void Start () {
 		borderMaterial = border.GetComponent<Renderer> ().material;
@@ -37,7 +39,7 @@ public class Node : MonoBehaviour {
 	}
 
 	public void AssignPlayerHover (Player player) {
-		hoveringPlayersColors.Add (player.color);
+		hoveringPlayersColors.Add (player.darkColor);
 		colorIndex = hoveringPlayersColors.Count - 1;
 		if (hasMounted)
 			FlashColor ();
@@ -46,11 +48,12 @@ public class Node : MonoBehaviour {
 	public void RemovePlayerHover (Player player) {
 		colorIndex = 0;
 		FlashColor ();
-		hoveringPlayersColors.Remove (player.color);
+		hoveringPlayersColors.Remove (player.darkColor);
 	}
 
-	public void AssignPlayer (Player player, float alpha) {
-		centerMaterial.color = player.color;
-		state = alpha;
+	public void AssignPlayer (Player player, int newState) {
+		owner = player;
+		centerMaterial.color = newState == 1 ? player.lightColor : player.darkColor;
+		state = newState;
 	}
 }

@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Player : MonoBehaviour {
-	public Color color;
 	public int[] currentPosition = new int[2];
+	public Color darkColor;
 	public GameController gameController;
+	public int id;
+	public Color lightColor;
 	public List<KeyCode> playerKeyCodes = new List<KeyCode> (); // indx 0 == up, indx 1 == right, indx 2 == down, indx 3 == left, 4 == select
 	public int selectionsMade = 0;
 
