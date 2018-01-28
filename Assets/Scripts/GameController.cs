@@ -3,6 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+// TODO Add in animations for nodes spreading
+// TODO Add in controller support
+// TODO Add in icons with the amount of tokens a player has left per turn
+// TODO Add in more players
+
 public class GameController : MonoBehaviour {
 	// Prefabs
 	public Node NodePrefab;
@@ -20,17 +25,26 @@ public class GameController : MonoBehaviour {
 	public float timeElapsed; // Since last turn
 	public float turnTime;
 
+	private float breakCountdown;
+	private float breakTime = 2.0f;
 	private bool gameOver = false;
 	private int globalCount = 0;
+	private bool inBreak = false;
 	private Node[,] nodes;
 	private Player player1;
+	private Node[] player1TokensRemaining;
 	private Player player2;
+	private Node[] player2TokensRemaining;
 	private float playArea = 7f;
 	private float winScreenTime = 3.0f;
 	private float winScreenCountdown;
 
 	void Update () {
-		if (gameInProgress) {
+		if (inBreak) {
+			breakCountdown += Time.deltaTime;
+			if (breakCountdown >= breakTime)
+				BeginNextTurn ();
+		} else if (gameInProgress) {
 			if (timeElapsed >= turnTime) {
 				EndTurn ();
 				return;
@@ -76,8 +90,6 @@ public class GameController : MonoBehaviour {
 //				float scaleX = gridX / playArea;
 //				float scaleY = gridY / playArea;
 //				newNode.transform.localScale = new Vector2 (scaleX, scaleY);
-//				float posX = (x + padding * x) - ((gridX + padding * x) / 2f);
-//				float posY = (y + padding * y) - ((gridY + padding * y) / 2f);
 
 				float posX = ((1 + padding) * x) + 0.5f - (totalSize / 2);
 				float posY = ((1 + padding) * y) - (totalSize / 2);
@@ -101,6 +113,11 @@ public class GameController : MonoBehaviour {
 		player1.lightColor = new Color (1.0f, 0.4f, 0.4f); // red
 		nodes [0, 0].AssignPlayerHover (player1);
 		player1.currentPosition = new int[2] { 0, 0 };
+		player1TokensRemaining = new Node[] { Instantiate (NodePrefab), Instantiate (NodePrefab) };
+		player1TokensRemaining [0].SetPosition (new Vector2 (-8f, -4f));
+		player1TokensRemaining [0].AssignPlayerToEntireNode (player1);
+		player1TokensRemaining [1].SetPosition (new Vector2 (-6.5f, -4f));
+		player1TokensRemaining [1].AssignPlayerToEntireNode (player1);
 
 		player2 = Instantiate (PlayerPrefab);
 		player2.gameController = this;
@@ -116,6 +133,11 @@ public class GameController : MonoBehaviour {
 		player2.lightColor = new Color (0.4f, 0.4f, 1.0f); // blue
 		nodes [gridX - 1, gridY - 1].AssignPlayerHover (player2);
 		player2.currentPosition = new int[2] { gridX - 1, gridY - 1 };
+		player2TokensRemaining = new Node[] { Instantiate (NodePrefab), Instantiate (NodePrefab) };
+		player2TokensRemaining [0].SetPosition (new Vector2 (8f, -4f));
+		player2TokensRemaining [0].AssignPlayerToEntireNode (player2);
+		player2TokensRemaining [1].SetPosition (new Vector2 (6.5f, -4f));
+		player2TokensRemaining [1].AssignPlayerToEntireNode (player2);
 
 		timeElapsed = 0;
 		winScreenCountdown = 0.0f;
@@ -125,9 +147,6 @@ public class GameController : MonoBehaviour {
 
 	void EndTurn () {
 		ProgressNodes ();
-		timeElapsed = 0;
-		player1.selectionsMade = 0;
-		player2.selectionsMade = 0;
 	}
 
 	public void MovePlayer (Player player, int movementIndex) {
@@ -191,18 +210,8 @@ public class GameController : MonoBehaviour {
 		}
 		if (count == gridX * gridY)
 			EndGame ();
-
-		for (int x = 0; x < gridX; x++) {
-			for (int y = 0; y < gridY; y++) {
-				Node node = nodes [x, y];
-				if (node.futureOwner != null) {
-					node.owner = node.futureOwner;
-					node.AssignPlayer (node.futureOwner, node.futureState);
-				}
-				if (node.futureState != null)
-					node.state = node.futureState;
-			}
-		}
+		else
+			BeginBreak ();
 	}
 
 	Player CheckAdvantage (int x, int y) {
@@ -259,6 +268,30 @@ public class GameController : MonoBehaviour {
 			return player2;
 		
 		return null;
+	}
+
+	void BeginNextTurn () {
+		inBreak = false;
+		timeElapsed = 0;
+		player1.selectionsMade = 0;
+		player2.selectionsMade = 0;
+	}
+
+	void BeginBreak () {
+		breakCountdown = 0.0f;
+		inBreak = true;
+
+		for (int x = 0; x < gridX; x++) {
+			for (int y = 0; y < gridY; y++) {
+				Node node = nodes [x, y];
+				if (node.futureOwner != null) {
+					node.owner = node.futureOwner;
+					node.AssignPlayerWithAnimation (node.futureOwner, node.futureState);
+				}
+				if (node.futureState != null)
+					node.state = node.futureState;
+			}
+		}
 	}
 
 	void EndGame () {

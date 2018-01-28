@@ -5,6 +5,10 @@ using UnityEngine;
 public class Node : MonoBehaviour {
 	private Material borderMaterial;
 	private Material centerMaterial;
+	private Color colorA;
+	private Color colorB;
+	private float colorAnimationCountdown = 0.5F;
+	private float colorAnimationTime = 0.5f;
 	private int colorIndex = 0;
 	private bool hasMounted = false;
 	private List<Color> hoveringPlayersColors = new List<Color> ();
@@ -20,9 +24,16 @@ public class Node : MonoBehaviour {
 	void Start () {
 		borderMaterial = border.GetComponent<Renderer> ().material;
 		centerMaterial = center.GetComponent<Renderer> ().material;
-		hoveringPlayersColors.Add (new Color (255, 255, 255));
+		hoveringPlayersColors.Add (new Color (1, 1, 1));
 		InvokeRepeating ("FlashColor", 0, 0.3f);
 		hasMounted = true;
+	}
+
+	void Update () {
+		if (colorAnimationCountdown < colorAnimationTime) {
+			centerMaterial.color = Color.Lerp (colorA, colorB, colorAnimationCountdown);
+			colorAnimationCountdown += Time.deltaTime;
+		}
 	}
 
 	void FlashColor () {
@@ -54,6 +65,29 @@ public class Node : MonoBehaviour {
 	public void AssignPlayer (Player player, int newState) {
 		owner = player;
 		centerMaterial.color = newState == 1 ? player.lightColor : player.darkColor;
+		state = newState;
+	}
+
+	public void AssignPlayerToEntireNode (Player player) {
+		if (centerMaterial == null)
+			centerMaterial = center.GetComponent<Renderer> ().material;
+		if (borderMaterial == null)
+			borderMaterial = border.GetComponent<Renderer> ().material;
+		centerMaterial.color = player.darkColor;
+		hoveringPlayersColors = new List<Color> ();
+		hoveringPlayersColors.Add (player.darkColor);
+	}
+
+	public void AssignPlayerWithAnimation (Player player, int newState) {
+		owner = player;
+		if (newState == 1) {
+			colorA = new Color (1, 1, 1);
+			colorB = player.lightColor;
+		} else {
+			colorA = player.lightColor;
+			colorB = player.darkColor;
+		}
+		colorAnimationCountdown = 0.0f;
 		state = newState;
 	}
 }
