@@ -14,6 +14,8 @@ public class GameController : MonoBehaviour {
 	public Slider TimerSlider;
 	public Text Title;
 	public Text WinnerText;
+	public Text CountDownTimerText;
+
 
 	// Game Settings
 	public bool gameInProgress = false;
@@ -22,6 +24,9 @@ public class GameController : MonoBehaviour {
 	public float padding;
 	public float timeElapsed; // Since last turn
 	public float turnTime;
+	public bool gameStartCountdown = false;
+	public float gameStartCountDownTimeElapsed = 0.0f;
+	public float gameStartCountDownTime = 3.0f;
 
 	private float breakCountdown;
 	private float breakTime = 2.0f;
@@ -52,8 +57,14 @@ public class GameController : MonoBehaviour {
 			winScreenCountdown += Time.deltaTime;
 			if (winScreenCountdown >= winScreenTime)
 				ReturnToMenu ();
+		} else if (gameStartCountdown) {
+			if (gameStartCountDownTimeElapsed >= gameStartCountDownTime) {
+				SetupGame ();
+				return;
+			}
+			gameStartCountDownTimeElapsed += Time.deltaTime;
 		} else if (!gameOver && Input.anyKey) {
-			SetupGame ();
+			startGameCountDownTimer ();
 		}
 	}
 
@@ -72,11 +83,19 @@ public class GameController : MonoBehaviour {
 		Prompt.gameObject.SetActive (true);
 	}
 
-	void SetupGame () {
+	void startGameCountDownTimer () {
 		// Hide UI
-		TimerSlider.gameObject.SetActive (true);
 		Title.gameObject.SetActive (false);
 		Prompt.gameObject.SetActive (false);
+
+		CountDownTimerText.gameObject.SetActive (true);
+		gameStartCountdown = true;
+	}
+
+	void SetupGame () {
+		CountDownTimerText.gameObject.SetActive (false);
+		gameStartCountdown = false;
+		TimerSlider.gameObject.SetActive (true);
 
 		// Setup game board
 		nodes = new Node[gridX, gridY];
